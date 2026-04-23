@@ -1,202 +1,296 @@
-import { useEffect, useState } from 'react'
-import { Header } from './components/Header'
-import { Hero } from './components/Hero'
-import { ProductCard } from './components/ProductCard'
-import { Footer } from './components/Footer'
-import { Toast } from './components/Toast'
-
-interface Product {
-  id: string
-  color: {
-    fr: string
-    darija: string
-  }
-  price: {
-    fr: string
-    darija: string
-  }
-  image: string
-  translations: {
-    fr: {
-      title: string
-      description: string
-    }
-    darija: {
-      title: string
-      description: string
-    }
-  }
-}
-
-const PRODUCTS: Product[] = [
+const features = [
   {
-    id: 'onyx',
-    color: {
-      fr: 'Noir onyx',
-      darija: 'أسود ملكي',
-    },
-    price: {
-      fr: '299 DT',
-      darija: '299 د.ت',
-    },
-    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1200&q=80&auto=format&fit=crop',
-    translations: {
-      fr: {
-        title: 'Casque audio sans fil haut de gamme - Noir onyx',
-        description:
-          'Son haute qualité, réduction de bruit active, confort enveloppant et autonomie longue durée pour écouter partout.',
-      },
-      darija: {
-        title: 'سماعات لاسلكية عالية الجودة - كحل أونيكس',
-        description: 'صوت عالي، عزل ضجيج فعّال، راحة كبيرة، وبطارية تدوم للاستماع في كل بلاصة.',
-      },
-    },
+    title: 'Agent IA Facebook Messages',
+    description: 'Réponses automatiques intelligentes pour vos clients Facebook.',
   },
   {
-    id: 'silver',
-    color: {
-      fr: 'Argent glacé',
-      darija: 'فضّي لامع',
-    },
-    price: {
-      fr: '319 DT',
-      darija: '319 د.ت',
-    },
-    image: 'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=1200&q=80&auto=format&fit=crop',
-    translations: {
-      fr: {
-        title: 'Casque audio sans fil haut de gamme - Argent glacé',
-        description:
-          'Une finition lumineuse avec un rendu sonore précis, confortable et pensée pour les longues sessions.',
-      },
-      darija: {
-        title: 'سماعات لاسلكية عالية الجودة - فضّي لامع',
-        description: 'تشطيب أنيق، صوت واضح ودقيق، وراحة ممتازة للاستعمال الطويل.',
-      },
-    },
+    title: 'Règles métier personnalisées',
+    description: 'Configurez vos réponses selon stock, livraison et retours.',
   },
   {
-    id: 'sand',
-    color: {
-      fr: 'Sable doux',
-      darija: 'رمل ناعم',
-    },
-    price: {
-      fr: '289 DT',
-      darija: '289 د.ت',
-    },
-    image: 'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=1200&q=80&auto=format&fit=crop',
-    translations: {
-      fr: {
-        title: 'Casque audio sans fil haut de gamme - Sable doux',
-        description:
-          'Une version plus douce visuellement, idéale pour un style minimaliste avec une autonomie fiable.',
-      },
-      darija: {
-        title: 'سماعات لاسلكية عالية الجودة - رمل ناعم',
-        description: 'نسخة هادئة ومرتبة، مثالية للّي يحبّ ستيل بسيط وبطارية موثوقة.',
-      },
-    },
+    title: 'Priorisation intelligente',
+    description: 'Traitez les messages urgents au bon moment.',
   },
 ]
 
-type Language = 'fr' | 'darija'
-
-const CATEGORIES = {
-  fr: ['Tous', 'Casques', 'Écouteurs'],
-  darija: ['الكل', 'سماعات رأس', 'سماعات أذن'],
-}
-
-function formatCountdown(targetTime: number) {
-  const now = Date.now()
-  const totalSeconds = Math.max(0, Math.floor((targetTime - now) / 1000))
-  const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0')
-  const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0')
-  const seconds = String(totalSeconds % 60).padStart(2, '0')
-
-  return `${hours}h ${minutes}m ${seconds}s`
-}
-
-const toastMessages: Record<Language, string> = {
-  fr: 'Produit ajouté au panier!',
-  darija: 'تزاد المنتج للسلة!',
-}
+const plans = [
+  {
+    name: 'Starter',
+    volume: '500',
+    unit: 'messages/mois',
+    description: 'Parfait pour démarrer',
+    features: ['Réponses automatiques', 'Règles de base', 'Support email'],
+    cta: 'Commencer gratuitement',
+    popular: false,
+  },
+  {
+    name: 'Growth',
+    volume: '2 000',
+    unit: 'messages/mois',
+    description: 'Pour boutiques en croissance',
+    features: ['Tout Starter', 'Règles avancées', 'Priorisation IA', 'Support prioritaire'],
+    cta: 'Choisir Growth',
+    popular: true,
+  },
+  {
+    name: 'Scale',
+    volume: '10 000',
+    unit: 'messages/mois',
+    description: 'Pour fort volume',
+    features: ['Tout Growth', 'API complète', 'Multi-boutiques', 'Support dédié'],
+    cta: 'Contacter ventes',
+    popular: false,
+  },
+]
 
 export default function App() {
-  const [selectedProduct, setSelectedProduct] = useState<Product>(PRODUCTS[0])
-  const [language, setLanguage] = useState<Language>('fr')
-  const [countdown, setCountdown] = useState('02h 45m 10s')
-  const [cartCount, setCartCount] = useState(0)
-  const [toast, setToast] = useState<string | null>(null)
-
-  useEffect(() => {
-    const targetTime = Date.now() + 2 * 60 * 60 * 1000 + 45 * 60 * 1000 + 10 * 1000
-
-    const updateCountdown = () => {
-      setCountdown(formatCountdown(targetTime))
-    }
-
-    updateCountdown()
-    const timerId = window.setInterval(updateCountdown, 1000)
-
-    return () => window.clearInterval(timerId)
-  }, [])
-
-  const handleAddToCart = () => {
-    setCartCount((c) => c + 1)
-    setToast(toastMessages[language])
-  }
-
   return (
-    <div className="min-h-screen bg-bg-light text-text-dark">
-      <Header language={language} onLanguageChange={setLanguage} cartCount={cartCount} />
+    <div className="relative min-h-screen overflow-x-hidden bg-bg-light text-text-dark">
+      <div className="pointer-events-none fixed inset-0 -z-20 bg-[radial-gradient(circle_at_20%_20%,rgba(5,84,189,0.14),transparent_36%),radial-gradient(circle_at_80%_10%,rgba(10,164,231,0.2),transparent_34%),linear-gradient(180deg,#f8fbff_0%,#eff5ff_100%)]" />
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-[linear-gradient(rgba(5,84,189,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(5,84,189,0.07)_1px,transparent_1px)] bg-[size:38px_38px] opacity-35" />
 
-      <main className="mx-auto w-full max-w-6xl px-4 py-8">
-        <Hero
-          selectedProduct={selectedProduct}
-          language={language}
-          countdown={countdown}
-          onAddToCart={handleAddToCart}
-          onSelectProduct={setSelectedProduct}
-          products={PRODUCTS}
-        />
+      <header className="sticky top-0 z-50 border-b border-primary/20 bg-white/75 backdrop-blur-xl">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 md:px-6">
+          <a href="#" className="inline-flex items-center gap-3" aria-label="Accueil">
+            <span className="grid h-10 w-10 place-items-center rounded-md border border-primary/30 bg-white text-[11px] font-black tracking-[0.15em] text-primary shadow-lg shadow-primary/20">
+              LOGO
+            </span>
+            <span className="text-xs font-bold uppercase tracking-[0.2em] md:text-sm">AI COMMERCE SUITE</span>
+          </a>
 
-        <section className="mt-brand-lg space-y-brand-md">
-          <div className="space-y-2">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Catalogue</p>
-            <h2 className="text-2xl font-[800] leading-[40px] text-text-dark">Variantes disponibles</h2>
+          <nav className="flex items-center gap-2 md:gap-3" aria-label="Navigation principale">
+            <button
+              type="button"
+              className="rounded-full border border-primary/35 bg-white px-4 py-2 text-xs font-bold text-primary transition-all duration-300 hover:-translate-y-0.5 hover:bg-selection"
+            >
+              Se connecter
+            </button>
+            <button
+              type="button"
+              className="rounded-full bg-primary px-4 py-2 text-xs font-bold text-white shadow-lg shadow-primary/35 transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110"
+            >
+              S'inscrire
+            </button>
+          </nav>
+        </div>
+      </header>
+
+      <main className="relative mx-auto w-full max-w-7xl px-4 pb-20 pt-12 md:px-8 md:pt-20">
+        {/* HERO SECTION */}
+        <section className="relative mb-24 text-center">
+          {/* Floating badges */}
+          <div className="mb-8 flex flex-wrap items-center justify-center gap-3">
+            <span className="hero-badge rounded-full border border-primary/30 bg-white/80 px-4 py-1.5 text-xs font-semibold tracking-wide text-primary backdrop-blur-sm">
+              SaaS Automation
+            </span>
+            <span className="hero-badge rounded-full bg-gradient-to-r from-primary to-accent-500 px-4 py-1.5 text-xs font-semibold tracking-wide text-white shadow-lg shadow-primary/30">
+              2 mois gratuits
+            </span>
           </div>
 
-          <div className="mb-brand-lg flex flex-wrap gap-brand-sm">
-            {CATEGORIES[language].map((category) => (
-              <button
-                key={category}
-                type="button"
-                className="rounded-full border border-primary bg-selection px-4 py-2 text-sm font-semibold text-text-dark transition-all duration-300 hover:bg-primary hover:text-bg-light"
+          {/* Main headline */}
+          <h1 className="hero-title mx-auto max-w-4xl text-5xl font-black leading-[1.05] tracking-tight md:text-7xl">
+            Votre agent IA pour{' '}
+            <span className="bg-gradient-to-r from-primary to-accent-500 bg-clip-text text-transparent">
+              Facebook Messages
+            </span>
+          </h1>
+
+          <p className="hero-subtitle mx-auto mt-6 max-w-2xl text-lg text-slate-600 md:text-xl">
+            Répondez automatiquement à vos clients. Moins d'erreurs. Meilleur timing. Plus de ventes.
+          </p>
+
+          {/* CTA Buttons */}
+          <div className="hero-cta mt-10 flex flex-wrap items-center justify-center gap-4">
+            <button
+              type="button"
+              className="group relative overflow-hidden rounded-full bg-primary px-8 py-4 text-sm font-bold text-white shadow-xl shadow-primary/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+            >
+              <span className="relative z-10">S'inscrire — 2 mois gratuits</span>
+              <div className="absolute inset-0 -z-0 bg-gradient-to-r from-accent-500 to-primary opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+            </button>
+            <button
+              type="button"
+              className="rounded-full border-2 border-slate-200 bg-white px-8 py-4 text-sm font-bold text-slate-700 transition-all duration-300 hover:-translate-y-1 hover:border-primary hover:text-primary"
+            >
+              Se connecter
+            </button>
+          </div>
+
+          {/* Hero Mockup */}
+          <div className="hero-mockup relative mx-auto mt-16 max-w-4xl">
+            <div className="relative rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl">
+              {/* Browser chrome */}
+              <div className="flex items-center gap-2 rounded-t-xl bg-slate-50 px-4 py-3">
+                <div className="flex gap-1.5">
+                  <div className="h-3 w-3 rounded-full bg-red-400" />
+                  <div className="h-3 w-3 rounded-full bg-amber-400" />
+                  <div className="h-3 w-3 rounded-full bg-green-400" />
+                </div>
+                <div className="ml-4 flex-1 rounded-lg bg-white px-3 py-1 text-xs text-slate-400">
+                  facebook.com/messages
+                </div>
+              </div>
+              
+              {/* Mockup content */}
+              <div className="grid gap-4 rounded-b-xl bg-gradient-to-br from-slate-900 to-[#0a1f3d] p-6 md:grid-cols-[1fr,1.2fr]">
+                {/* Chat list */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3 rounded-lg bg-white/10 p-3">
+                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-accent-500" />
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-white">Sarah M.</p>
+                      <p className="text-xs text-white/60">Commande #1234 — Répondu ✓</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 rounded-lg bg-white/5 p-3">
+                    <div className="h-10 w-10 rounded-full bg-slate-600" />
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-white">Ahmed K.</p>
+                      <p className="text-xs text-white/60">Question stock...</p>
+                    </div>
+                    <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-white">IA</span>
+                  </div>
+                </div>
+                
+                {/* Chat preview */}
+                <div className="rounded-xl bg-white/5 p-4">
+                  <div className="mb-4 flex items-center justify-between">
+                    <p className="text-xs font-bold uppercase tracking-wider text-white/50">Agent IA actif</p>
+                    <span className="flex h-2 w-2 rounded-full bg-green-400 animate-pulse" />
+                  </div>
+                  <div className="space-y-3">
+                    <div className="ml-auto max-w-[85%] rounded-2xl rounded-br-sm bg-primary px-4 py-2.5 text-sm text-white">
+                      Bonjour ! Votre colis est en transit. Livraison demain avant 18h 📦
+                    </div>
+                    <p className="text-xs text-white/40">Réponse générée en 2.3s</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Floating elements */}
+            <div className="absolute -left-8 top-1/4 rounded-xl border border-white/50 bg-white/90 p-3 shadow-xl backdrop-blur-sm animate-float-slow">
+              <p className="text-xs font-bold text-primary">⚡ Réponse instantanée</p>
+            </div>
+            <div className="absolute -right-4 bottom-1/4 rounded-xl border border-white/50 bg-white/90 p-3 shadow-xl backdrop-blur-sm animate-float-delayed">
+              <p className="text-xs font-bold text-green-600">✓ Erreur évitée</p>
+            </div>
+          </div>
+        </section>
+
+        {/* FEATURES SECTION */}
+        <section className="mb-24">
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-black tracking-tight md:text-4xl">Comment ça marche</h2>
+            <p className="mt-3 text-slate-600">Trois étapes pour automatiser vos réponses</p>
+          </div>
+          
+          <div className="grid gap-6 md:grid-cols-3">
+            {features.map((feature, i) => (
+              <div
+                key={feature.title}
+                className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
               >
-                {category}
-              </button>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-1 gap-brand-md md:grid-cols-3">
-            {PRODUCTS.map((product, index) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                language={language}
-                isActive={selectedProduct.id === product.id}
-                index={index}
-                onSelect={setSelectedProduct}
-              />
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary/10 to-accent-500/10 text-lg font-bold text-primary">
+                  {i + 1}
+                </div>
+                <h3 className="mb-2 text-lg font-bold">{feature.title}</h3>
+                <p className="text-sm text-slate-600">{feature.description}</p>
+              </div>
             ))}
           </div>
         </section>
+
+        {/* PRICING SECTION */}
+        <section className="mb-24">
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-black tracking-tight md:text-4xl">Choisissez votre plan</h2>
+            <p className="mt-3 text-slate-600">Selon votre volume de messages Facebook</p>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-3">
+            {plans.map((plan) => (
+              <div
+                key={plan.name}
+                className={`relative rounded-3xl p-1 transition-all duration-300 hover:-translate-y-2 ${
+                  plan.popular
+                    ? 'bg-gradient-to-b from-primary to-accent-500 shadow-2xl shadow-primary/25'
+                    : 'bg-slate-200'
+                }`}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-1 text-xs font-bold text-white shadow-lg">
+                    Recommandé
+                  </div>
+                )}
+                <div className="h-full rounded-[22px] bg-white p-6">
+                  <div className="mb-6">
+                    <h3 className="text-xl font-bold">{plan.name}</h3>
+                    <p className="mt-1 text-sm text-slate-500">{plan.description}</p>
+                  </div>
+
+                  <div className="mb-6">
+                    <span className="text-4xl font-black text-slate-900">{plan.volume}</span>
+                    <span className="ml-2 text-sm text-slate-500">{plan.unit}</span>
+                  </div>
+
+                  <ul className="mb-6 space-y-3">
+                    {plan.features.map((feature) => (
+                      <li key={feature} className="flex items-center gap-3 text-sm">
+                        <svg className="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span className="text-slate-700">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <button
+                    type="button"
+                    className={`w-full rounded-xl py-3 text-sm font-bold transition-all duration-300 ${
+                      plan.popular
+                        ? 'bg-primary text-white hover:bg-primary/90'
+                        : 'border-2 border-slate-200 text-slate-700 hover:border-primary hover:text-primary'
+                    }`}
+                  >
+                    {plan.cta}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* FINAL CTA SECTION */}
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary to-[#0a3f99] px-8 py-16 text-center text-white shadow-2xl shadow-primary/25 md:px-16 md:py-20">
+          <div className="pointer-events-none absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
+          
+          <div className="relative z-10">
+            <h2 className="mx-auto max-w-2xl text-3xl font-black leading-tight md:text-5xl">
+              Prêt à ne plus rater un message client ?
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-lg text-white/80">
+              2 mois gratuits. Sans engagement. Annulez quand vous voulez.
+            </p>
+            
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+              <button
+                type="button"
+                className="rounded-full bg-white px-8 py-4 text-sm font-bold text-primary shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+              >
+                S'inscrire gratuitement
+              </button>
+              <button
+                type="button"
+                className="rounded-full border-2 border-white/40 px-8 py-4 text-sm font-bold text-white transition-all duration-300 hover:bg-white/10"
+              >
+                Voir une démo
+              </button>
+            </div>
+          </div>
+        </section>
       </main>
-
-      <Footer />
-
-      {toast && <Toast message={toast} />}
     </div>
   )
 }

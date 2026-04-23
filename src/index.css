@@ -1,15 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;800&family=Noto+Sans+Arabic:wght@400;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import 'tailwindcss';
 @theme {
   --color-primary: oklch(54.6% 0.245 262.881);
+  --color-primary-500: #0554bd;
+  --color-accent-500: #0aa4e7;
   --color-text-dark: oklch(20.8% 0.042 265.755);
   --color-bg-light: oklch(98.4% 0.003 247.858);
   --color-selection: oklch(93.2% 0.032 255.585);
-  --font-brand: 'Inter', 'Noto Sans Arabic', sans-serif;
+  --font-brand: 'Inter', sans-serif;
   --spacing-brand-sm: 8px;
   --spacing-brand-md: 16px;
 }
-body { background-color: var(--color-bg-light); color: var(--color-text-dark); font-family: var(--font-brand); line-height: 1.5; }
+body { background-color: var(--color-bg-light); color: var(--color-text-dark); font-family: var(--font-brand); line-height: 1.5; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
 @keyframes floatGentle {
   0%,
@@ -96,4 +98,81 @@ body { background-color: var(--color-bg-light); color: var(--color-text-dark); f
 
 .animate-slide-in-up {
   animation: slideInUp 400ms ease-out;
+}
+
+.animate-float-slow {
+  animation: floatGentle 6s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: floatGentle 5s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+.hero-badge {
+  animation: fadeInSlideUp 0.6s ease-out both;
+}
+
+.hero-title {
+  animation: fadeInSlideUp 0.8s ease-out 0.1s both;
+}
+
+.hero-subtitle {
+  animation: fadeInSlideUp 0.8s ease-out 0.2s both;
+}
+
+.hero-cta {
+  animation: fadeInSlideUp 0.8s ease-out 0.3s both;
+}
+
+.hero-mockup {
+  animation: fadeInSlideUp 1s ease-out 0.5s both;
+}
+
+@keyframes beamSweep {
+  0% {
+    box-shadow: 0 0 0 0 rgba(10, 164, 231, 0.25);
+  }
+
+  70% {
+    box-shadow: 0 0 0 14px rgba(10, 164, 231, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(10, 164, 231, 0);
+  }
+}
+
+@keyframes floatPanel {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes orbitBadge {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(-4deg);
+  }
+
+  50% {
+    transform: translateY(-7px) rotate(3deg);
+  }
+}
+
+.offer-beam {
+  animation: beamSweep 2.8s ease-out infinite;
+}
+
+.showcase-float {
+  animation: floatPanel 5s ease-in-out infinite;
+}
+
+.offer-orb {
+  animation: orbitBadge 4.2s ease-in-out infinite;
 }
