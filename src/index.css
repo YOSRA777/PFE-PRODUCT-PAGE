@@ -1,0 +1,99 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;800&family=Noto+Sans+Arabic:wght@400;700;800&display=swap');
+@import 'tailwindcss';
+@theme {
+  --color-primary: oklch(54.6% 0.245 262.881);
+  --color-text-dark: oklch(20.8% 0.042 265.755);
+  --color-bg-light: oklch(98.4% 0.003 247.858);
+  --color-selection: oklch(93.2% 0.032 255.585);
+  --font-brand: 'Inter', 'Noto Sans Arabic', sans-serif;
+  --spacing-brand-sm: 8px;
+  --spacing-brand-md: 16px;
+}
+body { background-color: var(--color-bg-light); color: var(--color-text-dark); font-family: var(--font-brand); line-height: 1.5; }
+
+@keyframes floatGentle {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes pulseShadow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-primary) 45%, transparent);
+  }
+
+  50% {
+    box-shadow: 0 0 0 18px color-mix(in oklab, var(--color-primary) 0%, transparent);
+  }
+}
+
+.float-gentle {
+  animation: floatGentle 4s ease-in-out infinite;
+}
+
+.pulse-shadow {
+  animation: pulseShadow 2.4s ease-in-out infinite;
+}
+
+@keyframes fadeInSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-in {
+  animation: fadeInSlideUp 700ms ease-out both;
+}
+
+.fade-in {
+  animation-name: fadeInSlideUp;
+}
+
+.slide-in-from-bottom-4 {
+  animation-duration: 700ms;
+  animation-timing-function: ease-out;
+}
+
+@keyframes fadeInCard {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeInCard 650ms ease-out both;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-in-up {
+  animation: slideInUp 400ms ease-out;
+}
